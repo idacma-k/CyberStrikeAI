@@ -1,0 +1,79 @@
+name: "naabu"
+command: "naabu"
+enabled: true
+short_description: "快速端口扫描工具，支持主机发现与端口探测"
+description: |
+  naabu 是 ProjectDiscovery 出品的高速端口扫描器，专注于快速发现目标的开放端口。
+
+  **主要功能：**
+  - 快速 TCP 端口扫描（默认全端口或 top 100/1000）
+  - 主机存活探测
+  - 可与 httpx 串联，对发现的端口继续做 HTTP 探测
+  - 支持从 CIDR、ASN、域名解析结果批量扫描
+  - JSON 输出便于流水线消费
+
+  **使用场景：**
+  - 资产发现阶段的端口探测
+  - 攻击面梳理
+  - 渗透测试信息收集
+  - 与 subfinder + httpx 组成完整侦察链
+
+  **注意事项：**
+  - 当前安装的是 **CGO 关闭**版本，使用 TCP connect 扫描；SYN 半开扫描需要 libpcap 支持的 CGO 构建
+  - 端口扫描流量特征明显，务必仅在授权目标上使用，并注意目标侧的告警
+  - 默认扫描 top 100 端口，全端口扫描耗时长（`-p -` 或 `-top-ports 1000`）
+
+  **典型用法：**
+  `naabu -host example.com -top-ports 1000 -silent`
+parameters:
+  - name: "host"
+    type: "string"
+    description: "目标主机，域名、IP 或 CIDR（如 example.com、192.168.1.0/24）"
+    required: true
+    flag: "-host"
+    format: "flag"
+  - name: "ports"
+    type: "string"
+    description: "指定端口范围或列表（如 80,443,8000-8100）。留空则使用 top-ports"
+    required: false
+    flag: "-p"
+    format: "flag"
+  - name: "top_ports"
+    type: "string"
+    description: "扫描常见端口数量：100 / 1000 / full（full 等于全端口，很慢）"
+    required: false
+    default: "1000"
+    flag: "-top-ports"
+    format: "flag"
+  - name: "silent"
+    type: "bool"
+    description: "静默模式，只输出结果"
+    required: false
+    default: true
+    flag: "-silent"
+    format: "flag"
+  - name: "exclude_cdn"
+    type: "bool"
+    description: "自动排除 CDN 节点的 IP，避免扫描到 CDN 造成误判"
+    required: false
+    default: false
+    flag: "-exclude-cdn"
+    format: "flag"
+  - name: "rate"
+    type: "int"
+    description: "每秒发包速率上限（默认 1000，过高易触发目标防护）"
+    required: false
+    flag: "-rate"
+    format: "flag"
+  - name: "verify"
+    type: "bool"
+    description: "对发现的端口做二次验证，降低误报"
+    required: false
+    default: false
+    flag: "-verify"
+    format: "flag"
+  - name: "additional_args"
+    type: "string"
+    description: "额外的 naabu 参数，原样追加到命令行末尾（如 `-json -o /tmp/ports.json`）"
+    required: false
+    format: "positional"

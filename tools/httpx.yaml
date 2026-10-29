@@ -1,0 +1,99 @@
+name: "httpx"
+command: "httpx"
+enabled: true
+short_description: "HTTP/HTTPS 服务探测工具，批量识别存活主机、状态码、标题与技术栈"
+description: |
+  httpx 是 ProjectDiscovery 出品的高性能 HTTP 工具包，用于对大批量目标做快速 HTTP 探测。
+
+  **主要功能：**
+  - 批量探测 URL / 域名 / IP 的 HTTP 与 HTTPS 服务
+  - 提取状态码、页面标题、响应头、Content-Type
+  - 指纹识别（技术栈探测，可识别 Web 框架、CMS、中间件）
+  - TLS 证书信息采集
+  - 支持 JSON 输出，便于后续流水线处理
+
+  **使用场景：**
+  - 子域名存活验证（通常接在 subfinder 之后）
+  - Web 资产梳理与指纹识别
+  - 渗透测试信息收集阶段
+  - 漏洞扫描前的目标过滤（先确认哪些是 200 存活的 Web 服务）
+
+  **注意事项：**
+  - 默认开启 `-sc`（状态码）与 `-title`（标题），输出已是精简格式
+  - 大规模扫描时注意调整 `-threads` 与 `-rate-limit`，避免被目标封禁或打挂
+  - 仅在获得授权的目标上使用
+
+  **典型用法：**
+  `httpx -u example.com -sc -title -td`（探测单个目标并识别技术栈）
+parameters:
+  - name: "target"
+    type: "string"
+    description: "目标 URL、域名或 IP。多个目标可用逗号分隔（如 example.com,test.com）"
+    required: true
+    flag: "-u"
+    format: "flag"
+  - name: "silent"
+    type: "bool"
+    description: "静默模式，只输出结果，不打印横幅和统计信息"
+    required: false
+    default: true
+    flag: "-silent"
+    format: "flag"
+  - name: "status_code"
+    type: "bool"
+    description: "输出 HTTP 状态码"
+    required: false
+    default: true
+    flag: "-sc"
+    format: "flag"
+  - name: "title"
+    type: "bool"
+    description: "输出页面标题"
+    required: false
+    default: true
+    flag: "-title"
+    format: "flag"
+  - name: "tech_detect"
+    type: "bool"
+    description: "启用技术栈/指纹识别（如 nginx、React、WordPress）"
+    required: false
+    default: false
+    flag: "-td"
+    format: "flag"
+  - name: "web_server"
+    type: "bool"
+    description: "输出 Web 服务器类型（响应头 Server 字段）"
+    required: false
+    default: false
+    flag: "-web-server"
+    format: "flag"
+  - name: "content_length"
+    type: "bool"
+    description: "输出响应体长度"
+    required: false
+    default: false
+    flag: "-cl"
+    format: "flag"
+  - name: "status_filter"
+    type: "string"
+    description: "按状态码过滤，只保留匹配的响应（如 200,301,403）"
+    required: false
+    flag: "-mc"
+    format: "flag"
+  - name: "threads"
+    type: "int"
+    description: "并发线程数（默认 50，大规模扫描可调高，但注意目标承受能力）"
+    required: false
+    flag: "-threads"
+    format: "flag"
+  - name: "rate_limit"
+    type: "int"
+    description: "每秒最大请求数限制（默认 150）"
+    required: false
+    flag: "-rate-limit"
+    format: "flag"
+  - name: "additional_args"
+    type: "string"
+    description: "额外的 httpx 参数，原样追加到命令行末尾（如 `-json -o /tmp/out.json`）"
+    required: false
+    format: "positional"
